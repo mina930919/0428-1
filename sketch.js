@@ -1,4 +1,5 @@
 let capture;
+let overlayGraphics;
 
 function setup() {
   createCanvas(windowWidth, windowHeight); // 全視窗畫布
@@ -6,6 +7,13 @@ function setup() {
   capture = createCapture(VIDEO); // 擷取攝影機影像
   capture.size(windowWidth * 0.8, windowHeight * 0.8); // 設定影像大小為視窗的 80%
   capture.hide(); // 隱藏預設的 HTML 視訊元素
+
+  // 建立與視訊畫面一樣大小的 Graphics
+  overlayGraphics = createGraphics(capture.width, capture.height);
+  overlayGraphics.fill(0, 0, 255, 150); // 半透明藍色
+  overlayGraphics.textSize(32);
+  overlayGraphics.textAlign(CENTER, CENTER);
+  overlayGraphics.text('Overlay Content', overlayGraphics.width / 2, overlayGraphics.height / 2);
 }
 
 function draw() {
@@ -18,9 +26,19 @@ function draw() {
   scale(-1, 1); // 水平翻轉畫布
   image(capture, x, y, capture.width, capture.height); // 繪製翻轉後的攝影機影像
   pop(); // 恢復繪圖設定
+
+  // 繪製 Graphics 在視訊上方
+  image(overlayGraphics, x, y, capture.width, capture.height);
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight); // 當視窗大小改變時調整畫布
   capture.size(windowWidth * 0.8, windowHeight * 0.8); // 更新影像大小
+
+  // 更新 Graphics 大小
+  overlayGraphics = createGraphics(capture.width, capture.height);
+  //overlayGraphics.fill(0, 0, 255, 150); // 半透明藍色
+  overlayGraphics.textSize(32);
+  overlayGraphics.textAlign(CENTER, CENTER);
+  overlayGraphics.text('Overlay Content', overlayGraphics.width / 2, overlayGraphics.height / 2);
 }
