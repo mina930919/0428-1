@@ -1,5 +1,5 @@
 let capture;
-let overlayGraphics;
+let Graphics;
 
 function setup() {
   createCanvas(windowWidth, windowHeight); // 全視窗畫布
@@ -9,11 +9,8 @@ function setup() {
   capture.hide(); // 隱藏預設的 HTML 視訊元素
 
   // 建立與視訊畫面一樣大小的 Graphics
-  overlayGraphics = createGraphics(capture.width, capture.height);
-  overlayGraphics.fill(0, 0, 255, 150); // 半透明藍色
-  overlayGraphics.textSize(32);
-  overlayGraphics.textAlign(CENTER, CENTER);
-  overlayGraphics.text('Overlay Content', overlayGraphics.width / 2, overlayGraphics.height / 2);
+  Graphics = createGraphics(capture.width, capture.height);
+  drawOverlayGraphics(); // 初始化繪製 Graphics
 }
 
 function draw() {
@@ -27,8 +24,11 @@ function draw() {
   image(capture, x, y, capture.width, capture.height); // 繪製翻轉後的攝影機影像
   pop(); // 恢復繪圖設定
 
+  // 動態更新 Graphics
+  drawOverlayGraphics();
+
   // 繪製 Graphics 在視訊上方
-  image(overlayGraphics, x, y, capture.width, capture.height);
+  image(Graphics, x, y, capture.width, capture.height);
 }
 
 function windowResized() {
@@ -36,9 +36,22 @@ function windowResized() {
   capture.size(windowWidth * 0.8, windowHeight * 0.8); // 更新影像大小
 
   // 更新 Graphics 大小
-  overlayGraphics = createGraphics(capture.width, capture.height);
-  //overlayGraphics.fill(0, 0, 255, 150); // 半透明藍色
-  overlayGraphics.textSize(32);
-  overlayGraphics.textAlign(CENTER, CENTER);
-  overlayGraphics.text('Overlay Content', overlayGraphics.width / 2, overlayGraphics.height / 2);
+  Graphics = createGraphics(capture.width, capture.height);
+  drawOverlayGraphics(); // 重新繪製 Graphics
+}
+
+function drawOverlayGraphics() {
+  Graphics.background('#000000'); // 設定背景為黑色
+
+  // 確保 capture 已準備好
+  if (capture.loadedmetadata) {
+    for (let x = 0; x < Graphics.width; x += 15) { // 每隔 15 單位
+      for (let y = 0; y < Graphics.height; y += 15) {
+        let col = capture.get(x, y); // 擷取 capture 對應位置的顏色
+        Graphics.fill(col); // 設定圓的顏色
+        Graphics.noStroke();
+        Graphics.ellipse(x + 7.5, y + 7.5, 10, 10); // 繪製圓，中心點偏移 7.5
+      }
+    }
+  }
 }
